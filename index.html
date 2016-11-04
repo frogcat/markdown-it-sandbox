@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>markdown-it-sandbox</title>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.1.0/markdown-it.min.js"></script>
+  <script src="https://unpkg.com/markdown-it-deflist@2.0.1/dist/markdown-it-deflist.js"></script>
+  <script src="https://unpkg.com/markdown-it-footnote@3.0.1/dist/markdown-it-footnote.js"></script>
+  <script src="markdown-it-crossref.js"></script>
+  <style>
+    #container {
+      max-width: 800px;
+      margin: 10px auto;
+      font-family: sans-serif;
+    }
+
+    form {
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 10em;
+    }
+
+    article {
+      margin: 10px;
+    }
+
+    table {
+      width: 100%;
+      margin: 1em auto;
+      background-color: #f9f9f9;
+      border: 1px #aaa solid;
+      border-collapse: collapse;
+      color: black;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      text-align: center;
+      border: 1px #aaa solid;
+      padding: 0.2em;
+    }
+
+    td {
+      border: 1px #aaa solid;
+      padding: 0.2em;
+    }
+
+    figcaption,
+    caption {
+      font-weight: bold;
+    }
+
+    figure.fig {
+      margin: 1em auto;
+      text-align: center;
+    }
+
+    figure img {
+      display: block;
+      max-width: 100%;
+    }
+
+    figure.fig>div {
+      display: block;
+      width: 400px;
+      height: 300px;
+      background: #eee;
+      border: 1px dotted brown;
+      margin: 0 auto;
+      padding: 5px;
+      text-align: left;
+    }
+
+    p>code {
+      padding: 0;
+      padding-top: 0.2em;
+      padding-bottom: 0.2em;
+      margin: 0;
+      font-size: 85%;
+      background-color: rgba(0, 0, 0, 0.04);
+      border-radius: 3px;
+    }
+
+    figure.lst {
+      margin: 1em auto;
+      padding: .5em;
+      border-left-width: .5em;
+      border-left-style: solid;
+      border-color: #e0cb52;
+      background: #fcfaee;
+    }
+
+    figure.lst figcaption {
+      color: #b9ab2d;
+    }
+
+    pre {
+      margin-left: 2em;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <form>
+      <textarea></textarea>
+      <button>render</button>
+    </form>
+    <article>
+    </article>
+  </div>
+
+  <script>
+    $("form").submit(function() {
+      $("article").html(
+        window.markdownit()
+        .use(window.markdownitDeflist)
+        .use(window.markdownitFootnote)
+        .use(window.markdownitCrossref)
+        .render($("textarea").val())
+      );
+      return false;
+    });
+
+    $.get("example.md.txt").then(function(txt) {
+      $("textarea").val(txt);
+    });
+  </script>
+</body>
+
+</html>
