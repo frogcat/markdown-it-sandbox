@@ -116,7 +116,7 @@
       content: 'ノート';
       color: #2b2;
       display: block;
-      margin:0;
+      margin: 0;
       font-weight: bold;
     }
   </style>
@@ -134,13 +134,17 @@
 
   <script>
     $("form").submit(function() {
-      $("article").html(
-        window.markdownit()
-        .use(window.markdownitDeflist)
-        .use(window.markdownitFootnote)
-        .use(window.markdownitCrossref)
-        .render($("textarea").val())
-      );
+      try {
+        $("article").html(
+          window.markdownit()
+          .use(window.markdownitDeflist)
+          .use(window.markdownitFootnote)
+          .use(window.markdownitCrossref)
+          .render($("textarea").val())
+        );
+      } catch (e) {
+        console.log(e);
+      }
       return false;
     });
 
