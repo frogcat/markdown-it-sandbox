@@ -5,6 +5,41 @@
 var escapeHtml = require('./node_modules/markdown-it/lib/common/utils').escapeHtml;
 
 module.exports = function(md) {
+
+  /**
+   * 文中の　{.clazz} をパース
+   */
+  md.inline.ruler.after('image', 'clazz', function(state, silent) {
+    var head = state.pos;
+    if (state.src.charAt(head) !== '{')
+      return false;
+    if (state.src.charAt(head + 1) !== '.')
+      return false;
+    var tail = state.src.indexOf('}', head);
+    if (tail < head)
+      return false;
+    var text = state.src.substring(head + 2, tail);
+    if (!text.match(/^[a-z]+$/))
+      return false;
+    var token = state.push("clazz", "", 0);
+    token.meta = text;
+    token.hidden = true;
+    state.pos = tail + 1;
+    return true;
+  });
+
+  /**
+   * {.clazz} を paragraph に反映する
+   */
+  md.core.ruler.push('clazz', function(state, silent) {
+    state.tokens.forEach((a, i) => {
+      if (a.type !== 'paragraph_open') return;
+      state.tokens[i + 1].children.filter(b => b.type === 'clazz').forEach(b => {
+        a.attrPush(['class', b.meta]);
+      });
+    });
+  });
+
   /**
    * 文中の　{#(fig|tbl|lst|sec):(.+)} と　[@(fig|tbl|lst|sec):(.+)] をパース
    */
