@@ -60,8 +60,6 @@ module.exports = function(md) {
     if (tail > head) {
       var text = state.src.substring(head + 2, tail);
       if (text.match(/^(fig|tbl|lst|sec):([^\n]+)$/)) {
-        var a = RegExp.$1;
-        var b = RegExp.$2;
         var token = state.push(type, "", 0);
         token.meta = text;
         token.hidden = type === 'crossref_reg';
@@ -133,7 +131,7 @@ module.exports = function(md) {
     state.env.crossref = state.env.crossref || {};
     var tokens = state.tokens;
 
-    tokens.filter(a => a.children && a.children[0].type === 'image').forEach((self, i) => {
+    tokens.filter(a => a.children && a.children.length > 0 && a.children[0].type === 'image').forEach((self, i) => {
 
       // 前後の paragraph は非表示にする
       tokens[tokens.indexOf(self) - 1].hidden = true;
@@ -202,6 +200,27 @@ module.exports = function(md) {
     var html = md.renderer.renderToken(tokens, idx, options);
     if (tokens[idx].meta)
       html += '<span>' + escapeHtml(tokens[idx].meta) + '</span>\n';
+    return html;
+  };
+
+  /**
+   * 初出のヘッダーの直後に目次を挿入
+   */
+  md.renderer.rules.heading_close = function(tokens, idx, options, env, self) {
+    var html = md.renderer.renderToken(tokens, idx, options);
+    for (var i = 0; i < idx; i++)
+      if (tokens[i].type === "heading_close")
+        return html;
+    html += "\n";
+    html += "<ul class='toc'>";
+
+    tokens.filter((a, i) => i > idx && a.type === 'heading_open').forEach(token => {
+      html += "<li class='level" + token.markup.length + "'>";
+      html += "<a href='#" + token.attrGet('id') + "'>";
+      html += escapeHtml(token.attrGet('title'));
+      html += "</a></li>\n";
+    });
+    html += "</ul>";
     return html;
   };
 
